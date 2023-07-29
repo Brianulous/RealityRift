@@ -2,6 +2,7 @@ package com.teamsix.service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -51,24 +52,24 @@ public class OrderService {
 	private static final String X_LINE_ChannelId = "2000061352";
 	private static final String X_LINE_ChannelSecret = "aea25491631106811c5456e50c82b528";
 
-	   private final OrderRepository orderRepository;
-	    private final OrderDetailRepository orderDetailRepository;
-	    private final MemberService memberService;
-	    private final ItemRepository itemRepository;
-	    private final String ngrokUrl;
+	private final OrderRepository orderRepository;
+	private final OrderDetailRepository orderDetailRepository;
+	private final MemberService memberService;
+	private final ItemRepository itemRepository;
+	private final String ngrokUrl;
+	private final Clock clock;
 
-	    @Autowired
-	    OrderService(OrderRepository orderRepository,
-	                 OrderDetailRepository orderDetailRepository,
-	                 MemberService memberService,
-	                 ItemRepository itemRepository,
-	                 @Qualifier("ngrokUrl") String ngrokUrl) {
-	        this.orderRepository = orderRepository;
-	        this.orderDetailRepository = orderDetailRepository;
-	        this.memberService = memberService;
-	        this.itemRepository = itemRepository;
-	        this.ngrokUrl = ngrokUrl;
-	    }
+	@Autowired
+	OrderService(OrderRepository orderRepository, OrderDetailRepository orderDetailRepository,
+			MemberService memberService, ItemRepository itemRepository, @Qualifier("ngrokUrl") String ngrokUrl,
+			Clock clock) {
+		this.orderRepository = orderRepository;
+		this.orderDetailRepository = orderDetailRepository;
+		this.memberService = memberService;
+		this.itemRepository = itemRepository;
+		this.ngrokUrl = ngrokUrl;
+		this.clock = clock;
+	}
 
 	@Transactional
 	public void createOrderAndDetails(OrderRequest oq) {
@@ -100,35 +101,33 @@ public class OrderService {
 	}
 
 	@Transactional
-	public Page<Orders> getOrders(Integer memno, String period, String status, int page,
-	        int size) {
-	    Pageable pageable = PageRequest.of(page, size, Sort.by("orderId").descending());
+	public Page<Orders> getOrders(Integer memno, String period, String status, int page, int size) {
+		Pageable pageable = PageRequest.of(page, size, Sort.by("orderId").descending());
 
-	    Specification<Orders> spec = Specification.where(null);
+		Specification<Orders> spec = Specification.where(null);
 
-	    // 新增一個條件，確保訂單日期不超過當前時間
-	    Date now = new Date();
-	    spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("orderDate"), now));
+		// 時間bean
+		Date now = new Date(clock.millis());
+		spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("orderDate"), now));
 
-	    if (memno != null) {
-	        spec = spec.and((root, query, cb) -> {
-	            Join<Orders, Member> join = root.join("member");
-	            return cb.equal(join.get("memno"), memno);
-	        });
-	    }
+		if (memno != null) {
+			spec = spec.and((root, query, cb) -> {
+				Join<Orders, Member> join = root.join("member");
+				return cb.equal(join.get("memno"), memno);
+			});
+		}
 
-	    if (period != null && !period.equals("all")) {
-	        Date startDate = calculateStartDate(period);
-	        spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("orderDate"), startDate));
-	    }
+		if (period != null && !period.equals("all")) {
+			Date startDate = calculateStartDate(period);
+			spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("orderDate"), startDate));
+		}
 
-	    if (status != null && !status.equals("all")) {
-	        spec = spec.and((root, query, cb) -> cb.equal(root.get("orderStatus"), status));
-	    }
+		if (status != null && !status.equals("all")) {
+			spec = spec.and((root, query, cb) -> cb.equal(root.get("orderStatus"), status));
+		}
 
-	    return orderRepository.findAll(spec, pageable);
+		return orderRepository.findAll(spec, pageable);
 	}
-
 
 	private Date calculateStartDate(String period) {
 		LocalDate now = LocalDate.now();
@@ -198,7 +197,7 @@ public class OrderService {
 			StringBuilder itemNames = new StringBuilder();
 
 			for (OrderDetail detail : list) {
-				String itemNameWithDetails = detail.getItemname() + "    數量:    " + detail.getQuantity() ;
+				String itemNameWithDetails = detail.getItemname() + "    數量:    " + detail.getQuantity();
 				itemNames.append(itemNameWithDetails).append("#");
 			}
 
@@ -298,8 +297,7 @@ public class OrderService {
 		for (OrderDetail orderDetail : orderDetails) {
 			String productName = orderDetail.getItemname();
 			BigDecimal quantity = new BigDecimal(orderDetail.getQuantity());
-			productNameBuilder.append(
-					  String.format("%s * %s\n", productName, quantity.toPlainString()));
+			productNameBuilder.append(String.format("%s * %s\n", productName, quantity.toPlainString()));
 		}
 
 		// Remove the trailing comma
@@ -318,7 +316,7 @@ public class OrderService {
 		requestBody.put("productName", productNameBuilder.toString());
 		requestBody.put("amount", order.getTotalAmount().toString());
 		requestBody.put("currency", "TWD");
-		requestBody.put("productImageUrl",ngrokUrl + "/rr/img/images/newlogo.png");
+		requestBody.put("productImageUrl", ngrokUrl + "/rr/img/images/newlogo.png");
 		requestBody.put("confirmUrl", ngrokUrl + "/rr/managePage/paySucceed.do");
 		requestBody.put("orderId", orderId.toString());
 
