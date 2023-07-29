@@ -5,9 +5,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,8 +20,13 @@ import com.teamsix.service.CategoryService;
 @RequestMapping("/categories")
 public class CategoryController {
 
+	private final CategoryService categoryService;
+
 	@Autowired
-	private CategoryService categoryService;
+	public CategoryController(CategoryService categoryService) {
+		super();
+		this.categoryService = categoryService;
+	}
 
 	@GetMapping
 	public List<Category> getAllCategories() {
@@ -46,8 +51,8 @@ public class CategoryController {
 
 		return categoryService.createCategory(category);
 	}
-//patch  diff between patch & put 
-	@PutMapping
+
+	@PatchMapping
 	public Category updateCategory(@RequestBody CategoryRequestDTO categoryRequest) {
 		Category parentCategory = null;
 		if (categoryRequest.getParentid() != null) {
@@ -58,7 +63,6 @@ public class CategoryController {
 		category.setName(categoryRequest.getName());
 		category.setParent(parentCategory);
 
-		
 		return categoryService.updateCategory(category);
 	}
 
