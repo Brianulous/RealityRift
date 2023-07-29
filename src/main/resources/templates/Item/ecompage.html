@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="description" content="" />
+  <meta name="author" content="" />
+  <title>線上商城首頁</title>
+  <!-- Favicon-->
+  <link rel="icon" type="image/x-icon" href="/rr/img/assets/ecom_favicon.ico" />
+  <!-- Bootstrap icons-->
+  <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet" />
+  <!-- Core theme CSS (includes Bootstrap)-->
+  <link th:href="@{/css/ecom/socket.css}" rel="stylesheet" />
+  <link th:href="@{/css/ecom/navItem.css}" rel="stylesheet" />
+  <link th:href="@{/css/ecom/ecom_item.css}" rel="stylesheet" />
+  <link th:href="@{/css/ecom/ecom_page.css}" rel="stylesheet" />
+  <link rel="stylesheet" media="screen" th:href="@{/css/superfish/superfish.css}" />
+  <link rel="stylesheet" media="screen" th:href="@{/css/superfish/superfish-vertical.css}" />
+  <link th:href="@{/css/ecom/categoryList.css}" rel="stylesheet" />
+  <link th:href="@{/css/ecom/pagination.css}" rel="stylesheet" />
+
+  <style>
+  
+
+    .custom-header {
+      max-width: 1200px;
+
+      margin: 0 auto;
+
+    }
+
+    .sold-out-banner {
+      position: absolute;
+      bottom: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.5);
+      color: #ffffff;
+      padding: 10px;
+      width: 100%;
+      font-size: 20px;
+      text-align: center;
+      white-space: nowrap;
+      z-index: 1;
+      box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+    }
+    .sale-items {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+	.section-title {
+	    text-align: center;
+	    color: #333;
+	    font-size: 24px;
+	    margin-bottom: 20px;
+	}
+	
+	.item-container {
+	    display: flex;
+	    flex-wrap: wrap;
+	    justify-content: space-around;
+	}
+	.arrange-container {
+	  position: relative;
+	  height:150px; 
+	  max-width: 90%;
+	}
+	
+	.sortContainer {
+	  position: absolute; 
+	  left:75%;
+	  bottom: 0;
+	}
+	.menuContainer {
+	  margin-left: 7%;
+	}
+	.marquee {
+	    position: absolute;
+	    width: 60%;
+	    height: 35%;
+	    top: 10px; 
+	    left: 55%;
+	    overflow: hidden;
+	    background: #f0f0f0;
+	    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+	    border: 3px solid #000; /*初始化邊框*/
+	   transform: translateX(-50%);
+	}
+	
+	.marquee:before,
+	.marquee:after {
+	    content: '';
+	    position: absolute;
+	    top: 0;
+	    width: 10%;
+	    height: 100%;
+	    background: linear-gradient(90deg, rgba(240,240,240,1), rgba(240,240,240,0));
+	}
+	
+	.marquee:before {
+	    left: 0;
+	}
+	
+	.marquee:after {
+	    right: 0;
+	}
+	
+	.marquee p {
+	    position: relative;
+	    display: inline-block;
+	    padding-left: 100%;
+	    white-space: nowrap;  /* 確保文字在同一行內 */
+	    animation: marquee 8s linear infinite;
+	    font-size: 30px;
+	
+	}
+	
+	@keyframes marquee {
+	    0%   { transform: translateX(100%); }
+	    100% { transform: translateX(-100%); }
+	}
+	
+	
+	@keyframes borderChange {
+	    0%   { border-color: #000; border-width: 3px; }
+	    50%  { border-color: #f00; border-width: 5px; } /*在動畫的50%時間點，邊框顏色變為紅色，寬度變為10px*/
+	    100% { border-color: #000; border-width: 3px; }
+	}
+  </style>
+</head>
+
+<body>
+
+  <div th:replace="~{layout/main_navbar_ecom}"></div>
+<div class="container-fluid">
+
+
+
+  <!-- Header banner▼-->
+  <header class="custom-header bg-dark py-5">
+    <div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="carousel">
+      <div class="carousel-indicators">
+        <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" class="active"
+          aria-current="true" aria-label="Slide 1"></button>
+        <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1"
+          aria-label="Slide 2"></button>
+        <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2"
+          aria-label="Slide 3"></button>
+      </div>
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+           <div class="imgblock" style="max-width: 800px; height: 400px; margin: 0 auto; text-align: center;">
+          <img src="/rr/img/itemimgs/sunflower.jpg" class="d-block w-100" alt="..." style="height: 400px; object-fit: cover;">
+            <div class="carousel-caption d-none d-md-block">
+              <h1>活出最美的自己</h1>
+            </div>
+
+          </div>
+        </div>
+        <div class="carousel-item">
+          <div class="imgblock" style="max-width: 800px; height: 400px; margin: 0 auto; text-align: center;">
+
+            <img src="/rr/img/itemimgs/summersale.jpg" class="d-block w-100" alt="..." style="height: 400px; object-fit: contain;">
+            <div class="carousel-caption d-none d-md-block">
+              <h1>夏季特賣 沁涼一夏</h1>
+            </div>
+          </div>
+        </div>
+       <div class="carousel-item">
+          <div class="imgblock" style="max-width: 800px; height: 400px; margin: 0 auto; text-align: center;">
+
+            <img src="/rr/img/itemimgs/xiaoxiao.jpg" class="d-block w-100" alt="..." style="height: 400px; object-fit: contain;">
+            <div class="carousel-caption d-none d-md-block">
+              <h1>小小兵 最強聯名商品</h1>
+            </div>
+          </div>
+        </div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions"
+        data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions"
+        data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+    </div>
+    </div>
+  </header>
+  <!-- Header banner▲  -->
+  <input type="hidden" id="session" th:value="${session.member?.memno}" />
+
+<div class="arrange-container">
+    <!-- 選單 -->
+    <div class="col-md-3 menuContainer">
+      <ul class="sf-menu sf-vertical" id="menu">
+      </ul>
+    </div>
+    <!-- 選單 -->
+
+
+    <!-- 排序 -->
+    <div class="col-md-2 sortContainer">
+      <div class="form-group">
+          <select id="sort" class="form-select form-select">
+              <option value="" disabled selected>選擇排序</option>
+              <option value="price_asc">價格：低到高</option>
+              <option value="price_desc">價格：高到低</option>
+              <option value="added_asc">日期：舊到新</option>
+              <option value="added_desc">日期：新到舊</option>
+              <option value="salescount_asc">銷量：低到高</option>
+              <option value="salescount_desc">銷量：高到低</option>
+          </select>
+      </div>
+    </div>
+    <!-- 排序 -->
+    
+      <div class="marquee">
+        <p>夏季特賣全面啟動!  夏季特賣全面啟動!  </p>
+    </div>
+</div>
+
+
+  <!-- 選單選取商品 -->
+  <section class="py-1">
+    <div class="container px-4 px-lg-5 mt-5">
+      <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+      </div>
+    </div>
+    <nav>
+      <ul class="pagination d-flex justify-content-center flex-wrap pagination-rounded-flat pagination-success"
+        id="pagination">
+      </ul>
+    </nav>
+  </section>
+  <!-- 選單選取商品 -->
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 sale-items">
+   <div class="sale-items">
+    <h1 class="section-title">特賣專區</h1>
+        <div th:replace="~{item/carousel}"></div>
+</div>
+        </div>
+    </div>
+</div>
+
+
+  <!-- btn-to-top -->
+  <a href="#" class="btn btn-to-top"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+      class="bi bi-arrow-bar-up" viewBox="0 0 16 16">
+      <path fill-rule="evenodd"
+        d="M8 10a.5.5 0 0 0 .5-.5V3.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 3.707V9.5a.5.5 0 0 0 .5.5zm-7 2.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5z" />
+    </svg>
+  </a>
+
+  <!-- Footer-->
+  <!-- Footer-->
+</div>
+  <footer class="py-5 bg-dark">
+    <div class="container">
+      <p class="m-0 text-center text-white">Copyright &copy; 第六組 張浩輔 線上商城 2023</p>
+      <img style="width:100px;height:100px" src="/rr/img/assets/ecpay.png"/>
+    </div>
+  </footer>
+  <script src="https://kit.fontawesome.com/7e347cd6cd.js" crossorigin="anonymous"></script>
+  <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+  <script th:src="@{/js/ecompage.js}"></script>
+  <script th:src="@{/js/jquery-3.7.0.min.js}"></script>
+  <script th:src="@{/js/superfish/hoverIntent.js}"></script>
+  <script th:src="@{/js/superfish/superfish.js}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+  
+
+  <script>
+	var socket = new SockJS('/rr/websocket-endpoint');
+	var stompClient = Stomp.over(socket);
+	var unreadCount = document.createElement('span');
+	unreadCount.id = 'unread-count';
+	unreadCount.style.display = 'none';// 默認隱藏
+	document.getElementById('bell').appendChild(unreadCount);
+	
+	stompClient.connect({}, function(frame) {
+	    console.log('Connected: ' + frame);
+	    stompClient.subscribe('/topic/notifications', function(notification) {
+	        var parsedNotification = JSON.parse(notification.body);
+	        addNotification(parsedNotification);
+	        
+	        var notifications = JSON.parse(localStorage.getItem('notifications')) || [];
+	        notifications.push(parsedNotification);
+	        localStorage.setItem('notifications', JSON.stringify(notifications));
+	        
+	        document.getElementById('bell').classList.add('unread');
+	        
+	        // 更新未讀通知數量
+	        document.getElementById('unread-count').textContent = notifications.length;
+	        document.getElementById('unread-count').style.display = 'inline';  // 顯示數量
+	        
+	        // 設置 10 分鐘後清除 localStorage
+	        setTimeout(function() {
+	            localStorage.removeItem('notifications');
+	            document.getElementById('unread-count').style.display = 'none';  // 隱藏數量
+	        }, 10 * 60 * 1000);
+	    });
+	}, function(error) {
+	    console.log('STOMP error: ' + error);
+	});
+	function addNotification(notification) {
+	    var notificationList = document.getElementById('notifications-list'); // 選擇通知列表
+	
+	    // 創建新的通知元素
+	    var newNotification = document.createElement('div');
+	    newNotification.className = 'notifications-item';
+	
+	    // 創建通知的圖片
+	    var img = document.createElement('img');
+	    img.src = '/rr/img/itemimgs/'+notification.imgSrc; // 使用通知中的圖片URL
+	    img.alt = 'img';
+	    newNotification.appendChild(img);
+	
+	    // 創建通知的文字部分
+	    var text = document.createElement('div');
+	    text.className = 'text';
+	
+	    // 創建通知的標題
+	    var h4 = document.createElement('h4');
+	    h4.textContent = notification.title; // 使用通知中的標題
+	    text.appendChild(h4);
+	
+	    // 創建通知的內容
+	    var p = document.createElement('p');
+	    p.textContent = notification.content; // 使用通知中的內容
+	    text.appendChild(p);
+	
+	    newNotification.appendChild(text);
+	
+	    // 將新的通知添加到通知列表的開始
+	    notificationList.insertBefore(newNotification, notificationList.firstChild);
+	}
+	
+	document.getElementById('bell').addEventListener('click', function() {
+	    this.classList.remove('unread');
+	    
+	    // 將未讀通知數量清零，並隱藏數量
+	    document.getElementById('unread-count').textContent = '';
+	    document.getElementById('unread-count').style.display = 'none';
+	});
+	  
+  
+    //superFish
+    jQuery(document).ready(function () {
+      jQuery('ul.sf-menu').superfish({
+        animation: { height: 'show' },  // slide-down effect without fade-in
+        delay: 750
+      });
+    });
+
+window.onload = function() {
+    var notifications = JSON.parse(localStorage.getItem('notifications')) || [];
+    notifications.forEach(addNotification);
+};
+
+    $(document).ready(function () {
+    
+           
+        var down = false;
+        
+        $('#bell').click(function(e){
+          
+            var color = $(this).text();
+            if(down){
+                
+                $('#box').css('height','0px');
+                $('#box').css('opacity','0');
+                down = false;
+            }else{
+                
+                $('#box').css('height','auto');
+                $('#box').css('opacity','1');
+                down = true;
+                
+            }
+            
+        });
+    
+      changeCart();
+
+      let mem = $('#session').val();
+      localStorage.setItem('session', mem);
+      
+
+
+      const categoryId = 'all';
+      const page = 0;
+      const size = 8;
+      const data2 = {
+        page: page,
+        size: size,
+        categoryId: categoryId
+      };
+      $.ajax({
+        url: '/rr/pageAllItems.do',
+        type: 'post',
+        dataType: 'json',
+        data: data2,
+        success: function (data) {
+          console.log(data);
+          const productCards = generateProductCard(data);
+          $('.row-cols-2.row-cols-md-3.row-cols-xl-4.justify-content-center').html(productCards);
+
+
+          //generate完成後綁定購物車事件
+          bindAddToCartEvents();
+
+          /////////////// 分頁按鈕生成///////////////////
+          var totalPages = data.totalPages; // 總頁數
+          var currentPage = data.number; // 目前頁數
+          var pagination = $("#pagination"); // 分頁的元件
+
+          // 清除現有的按鈕
+          pagination.empty();
+
+          // 產生新的按鈕
+          for (var i = 0; i < totalPages; i++) {
+            // 使用立即執行的函式表達式 (IIFE) 來捕獲每次迴圈的 i 值
+            (function (i) {
+              var btn = $('<li class="page-item"><a class="page-link" href="#">' + (i + 1) + '</a></li>');
+              // 如果是目前的頁面，則加上active的class
+              if (i == currentPage) {
+                btn.addClass("active");
+              }
+              // 當按鈕被按下時，呼叫某個函數來取得該頁面的資料
+              btn.click(function () {
+                menuItemClick(categoryId, i);
+              });
+
+              pagination.append(btn);
+            })(i); // 這裡傳入當前的 i 值
+          }
+        },
+
+        error: function (error) {
+          console.log(error);
+        }
+      });
+    });
+
+    //動態抓取categories選單
+    let url = "/rr/categories/1";
+
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('menu').innerHTML = generateMenu(data);
+
+        const menuItems = document.querySelectorAll('a[data-category-id]');
+        menuItems.forEach(item => {
+          item.addEventListener('click', function (event) {
+            event.preventDefault();
+            const categoryId = this.getAttribute('data-category-id');
+            console.log("Menu item clicked, category id: ", categoryId);
+            menuItemClick(categoryId);
+          });
+        });
+
+        jQuery('ul.sf-menu sf-vertical').superfish({
+          animation: { height: 'show' },
+          delay: 1200
+        });
+
+
+        $("#sort").change(function () {
+          const sortType = $(this).val();
+          console.log(sortType);
+          menuItemClick(currentCategoryId, 0, sortType);
+        });
+
+
+      })
+      .catch(error => console.error('Error:', error));
+
+    /////////////////需再加強/////////////////////
+    function generateMenu(data, level = 0) {
+      let menuHTML = '';
+      // 添加「全部商品」選項
+      if (level === 0) {
+        menuHTML += `
+      <li>
+        <a href="#" data-category-id="all">全部商品</a>
+      </li>
+    `;
+      }
+      for (let category of data.subCategories) {
+        menuHTML += `
+      <li>
+    `;
+        ////////////////////////////////尋求更佳寫法/////////////////////////////////////
+        if (level === 2) {
+          menuHTML += `<a href="#" data-category-id="${category.id}">${'&nbsp;'.repeat(level * 2)}${category.name}</a>`;
+        } else {
+          menuHTML += `<a href="#${category.id}" data-category-id="${category.id}">${'&nbsp;'.repeat(level * 2)}${category.name}</a>`;
+        }
+        if (category.subCategories && category.subCategories.length > 0) {
+          menuHTML += `
+        <ul>
+          ${generateMenu(category, level + 1)}
+        </ul>
+      `;
+        }
+        menuHTML += '</li>';
+      }
+      return menuHTML;
+    }
+
+
+    let currentCategoryId = 'all';
+    function menuItemClick(categoryId, page = 0, sortType = 'added_desc') {
+      const size = 8;
+      currentCategoryId = categoryId;
+      // 如果categoryId等於'all'，則使用getItemByCategoryId.do來獲取所有商品數據
+
+
+      const url = categoryId === 'all'
+        ? "/rr/pageAllItems.do"
+        : "/rr/getItemByCategoryId.do";
+
+      const data1 = {
+        categoryId: categoryId,
+        page: page,
+        size: size,
+        sort: sortType  // 加入排序的參數
+      };
+      console.log(JSON.stringify(data1));
+      $.ajax({
+        url: url,
+        type: 'POST',
+        //contentType: 'application/json',
+        data: data1,
+        success: function (data) {
+
+          const productCards = generateProductCard(data);
+          $('.row-cols-2.row-cols-md-3.row-cols-xl-4.justify-content-center').html(productCards);
+          //購物車事件綁定
+          bindAddToCartEvents();
+
+          // 這裡加入分頁按鈕的生成
+          var totalPages = data.totalPages; // 總頁數
+          var currentPage = data.number; // 目前頁數
+          var pagination = $("#pagination"); // 分頁的元件
+
+          // 清除現有的按鈕
+          pagination.empty();
+
+          // 產生新的按鈕
+          for (var i = 0; i < totalPages; i++) {
+            // 使用立即執行的函式表達式 (IIFE) 來捕獲每次迴圈的 i 值
+            (function (i) {
+              var btn = $('<li class="page-item"><a class="page-link" href="#">' + (i + 1) + '</a></li>');
+
+              // 如果是目前的頁面，則加上active的class
+              if (i == currentPage) {
+                btn.addClass("active");
+              }
+
+
+              // 當按鈕被按下時，呼叫某個函數來取得該頁面的資料
+              btn.click(function () {
+                menuItemClick(categoryId, i, sortType);
+              });
+
+              pagination.append(btn);
+            })(i); // 這裡傳入當前的 i 值
+          }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          console.error('Error:', textStatus, errorThrown);
+        }
+      });
+    }
+
+	//******************商品卡生成**************************
+    function generateProductCard(data) {
+      console.log(data);
+      let productHTML = '';
+
+        <!-- '尚無商品' block -->
+      if (data.content.length === 0) {
+        productHTML = `
+		<div class="col mb-5">
+		  <div class="card h-100">
+		    <div class="product-grid">
+		      <div class="product-content text-center">
+		        <div class="icon" style="font-size: 3em; color: #ccc;">
+		          <i class="fa fa-exclamation-circle"></i>
+		        </div>
+		        <h3 class="title">尚無商品</h3>
+		        <p class="description">我們正在添加更多商品，請稍後再來查看。</p>
+		      </div>
+		    </div>
+		  </div>
+		</div>`;
+        return productHTML;
+      }
+
+      const hasAvailableProduct = data.content.some(product => product.item.itemstatus !== '停售');
+
+      if (!hasAvailableProduct) {
+        productHTML = `
+		   <div class="col mb-5">
+		  <div class="card h-100">
+		    <div class="product-grid">
+		      <div class="product-content text-center">
+		        <div class="icon" style="font-size: 3em; color: #ccc;">
+		          <i class="fa fa-times-circle"></i>
+		        </div>
+		        <h3 class="title">所有商品都已停售</h3>
+		        <p class="description">我們正在更新我們的商品，請稍後再來查看。</p>
+		      </div>
+		    </div>
+		  </div>
+		</div>`;
+        return productHTML;
+      }
+
+      for (let product of data.content) {
+        const { item, images } = product;
+        const { itemname, price, itemstatus, itemid, salescount } = item;
+
+        if (itemstatus === '停售') {
+          continue;  // 跳過停售的商品
+        }
+
+        let soldOutLabel = '';
+        if (itemstatus === '售完') {
+          soldOutLabel = `<div class="sold-out-banner" id="sold-out-${itemid}">售完</div>`;  // 添加售完的標籤
+        }
+
+        let img1 = "defaultPic.jpg"; // Default image
+        let img2 = "defaultPic.jpg"; // Default image
+
+        if (images.length > 0) {
+          img1 = images[0].imagename;
+          img2 = images.length > 1 ? images[1].imagename : img1;
+        }
+
+
+        const productData = `data-product='${JSON.stringify(product)}'`;
+
+        productHTML += `
+      <div class="col mb-5">
+        <div class="card h-100">
+          <div class="product-grid">
+            <div class="product-image">
+             ${soldOutLabel}  <!-- 添加售完的標籤 -->
+              <a href="#" class="image">
+                <img class="img-1" src="/rr/img/itemimgs/${img1}">
+                <img class="img-2" src="/rr/img/itemimgs/${img2}">
+              </a>
+              <ul class="product-links">
+                <li><a href="#"><i class="fa fa-heart"></i></a></li>
+                <li><a href="#"><i class="fa fa-random"></i></a></li>
+                <li><a href="#" data-product='${JSON.stringify(product)}' data-sale="false" data-bind-event="true"><i class="fa fa-shopping-cart"></i></a></li>
+              </ul>
+              <a href="#" class="product-view"><i class="fa fa-search"></i></a>
+            </div>
+            <div class="product-content">
+              <ul class="rating">
+                <li class="fas fa-star"></li>
+                <li class="fas fa-star"></li>
+                <li class="fas fa-star"></li>
+                <li class="fas fa-star"></li>
+                <li class="fas fa-star disable"></li>
+                <li class="disable">(1 reviews)</li>
+              </ul>
+              <h3 class="title">名稱 :<a href="#">${itemname}</a></h3>
+              <div class="price">價格 :NT ${price}</div>
+              <div class="price">銷量 :${salescount}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+      }
+      return productHTML;
+    }
+
+    //將綁定寫成方法指定於數據載入完成後綁定
+function bindAddToCartEvents() {
+  changeCart();
+ document.querySelectorAll('a[data-bind-event="true"]').forEach(function (link) {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      const product = JSON.parse(this.getAttribute('data-product')); // Get data from data-product
+      const isSaleItem = JSON.parse(this.getAttribute('data-sale')); // Get data from data-sale
+      console.log('About to call addToCart from bindAddToCartEvents');
+      addToCart(product, isSaleItem); // Add the item to the cart
+
+      // 弹出一个提示已添加到购物车的sweetalert2弹框
+      Swal.fire({
+        icon: 'success',
+        title: '成功加入購物車',
+        showConfirmButton: true
+      });
+    });
+});
+}
+
+function addToCart(product, isSaleItem) {
+console.log("addToCart called")
+console.log('product'+ JSON.stringify(product));
+  let cart = localStorage.getItem('cart');
+  cart = cart ? JSON.parse(cart) : [];
+  
+  const index = cart.findIndex(item => item.item.itemid === product.item.itemid && item.isSaleItem === isSaleItem);
+  if (index !== -1) {
+  console.log('上');
+    cart[index].quantity += 1;
+  } else {
+  console.log('下')
+    cart.push({ ...product, quantity: 1, isSaleItem });
+  }
+
+  localStorage.setItem('cart', JSON.stringify(cart));
+  console.log(localStorage.getItem('cart'));
+changeCart();  
+}
+
+
+    function changeCart() {
+      let cart = localStorage.getItem('cart');
+      cart = cart ? JSON.parse(cart) : [];
+
+
+      let count = 0;
+      for (let item of cart) {
+        count += item.quantity;
+      }
+
+      document.getElementById('cart-count').textContent = count;
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" class=light>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CategoryManage</title>
+
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/itemDataTable.css}" rel="stylesheet">
+    <link th:href="@{/css/ecom/jquery-ui.min.css}" rel="stylesheet">
+    <link th:href="@{/css/ecom/jquery-ui.theme.min.css}" rel="stylesheet">
+    <link th:href="@{/css/cdn.jsdelivr.net_npm_sweetalert2@11.7.12_dist_sweetalert2.min.css}" rel="stylesheet">
+    <style>
+          .block {
+        width: 360px;
+        padding: 20px;
+        margin-bottom: 15px;
+        border-radius: 10px;
+        /* Rounded corners */
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        /* Shadow for 3D effect */
+        transition: transform .2s;
+        /* Animation */
+        font-weight: 500px;
+        font-size: 21px;
+        /* Make text bolder */
+    }
+
+    .block:hover {
+        transform: scale(1.03);
+        /* Slightly enlarge the block when hovered */
+    }
+
+    .level-0-block {
+        background-color: #f7b731;
+        border-left: 5px solid #f7b731;
+        background: linear-gradient(135deg, #f7b731, #f7b731);
+        /* Gradient background */
+    }
+
+    .level-1-block {
+        background-color: #82ccdd;
+        border-left: 5px solid #82ccdd;
+        background: linear-gradient(135deg, #82ccdd, #82ccdd);
+        /* Gradient background */
+    }
+
+    .level-2-block {
+        background-color: #60a3bc;
+        border-left: 5px solid #60a3bc;
+        background: linear-gradient(135deg, #60a3bc, #60a3bc);
+        /* Gradient background */
+    }
+
+    .ui-widget-overlay {
+        background: transparent;
+    }
+
+    .fixed-button {
+        position: fixed;
+        right: 20px; /* 20px from the right side of the screen */
+        top: 100px; /* 100px from the top of the screen */
+        z-index: 1000; 
+        margin-right:30px;/* ensures the button stays on top of other elements */
+        padding: 15px 25px; /* make the button larger */
+        font-size: 20px; /* make the text larger */
+        background-color: #4b6584; /* Button color */
+        color: #FFFFFF; /* white text */
+        border-radius: 50px; /* rounded corners */
+    }
+
+    .app-container {
+        background: #4b6584; /* Background color */
+    }
+    </style>
+</head>
+
+<body>
+    <div id="loadingScreen"
+        style="position: fixed; left: 0; top: 0; width: 100%; height: 100%; background: #fff; z-index: 9999;">
+        <h1 style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">前往類別管理...</h1>
+    </div>
+    <div class="app-container">
+        <div th:replace="~{layout/item_sidebar}"></div>
+        <div class="app-content" style="min-height: 100vh">
+            <div class="app-content-header">
+                <h1 class="app-content-headerText">類別管理</h1>
+                <button class="mode-switch" title="Switch Theme">
+                    <svg class="moon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                        stroke-width="2" width="24" height="24" viewBox="0 0 24 24">
+                        <defs></defs>
+                        <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+                    </svg>
+                </button>
+
+            </div>
+
+            <div class="row" style="overflow-y: auto;">
+                <div class="container mt-4 col-12">
+
+                    <div class="row">
+                        <div class="col-6 mt-4">
+                       <button type="button" class="btn btn-outline-light fixed-button" data-toggle="modal" data-target="#addCategoryModal">
+						    新增
+						</button>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div id="categories">
+                                <!-- dynamically inserted here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="addCategoryModal" tabindex="-1" role="dialog" aria-labelledby="addCategoryModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCategoryModalLabel">新增類別</h5>
+                    <button type="button" class="close" id="modal-close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-category-form">
+                        <div class="form-group">
+                            <label for="category-name">名稱:</label>
+                            <input type="text" id="category-name" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="parent-category">父類別:</label>
+                            <select id="parent-category" class="form-control">
+                                <option value="1">None</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="addCategory()">新增</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="dialog" title="通知" style="display: none;">
+        <p id="dialog-message"></p>
+    </div>
+    <script th:src="@{/js/jquery-3.7.0.min.js}"></script>
+    <script th:src="@{/js/ecom/jquery-ui.min.js}"></script>
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script th:src="@{/js/cdn.jsdelivr.net_npm_sweetalert2@11.7.12_dist_sweetalert2.all.min.js}"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="https://kit.fontawesome.com/7e347cd6cd.js" crossorigin="anonymous"></script>
+    <script th:src="@{/js/jquery.itemdataTables.js}"></script>
+    <script th:src="@{/js/dashboard2.js}"></script>
+
+    <script>
+        $(window).on('load', function () {
+            // Hide the loading screen after the page is loaded
+            $('#loadingScreen').fadeOut(1000);
+        });
+        function createCategoryElement(category, level = 0) {
+            // Determine the block class based on level
+            let blockClass = `level-${level}-block`;
+            let categoryElement = document.createElement('div');
+            categoryElement.innerHTML = `
+        <div id="category-${category.id}" class="block ${blockClass}" style="margin-left: ${level * 130}px">
+            <p>
+                <span class="category-name" contenteditable="false">${category.name}</span> 
+                <span class="parent-category-id" style="display: none">${category.parentid}</span>
+
+                <button class="edit-button btn btn-info btn-sm" onclick="editCategory(${category.id})">編輯</button>
+                <button class="delete-button btn btn-warning btn-sm onclick="deleteCategory(${category.id})">刪除</button>
+            </p>
+        </div>`;
+            console.log(category.parentid);
+            return categoryElement;
+        }
+        function displayCategories(categories, parentElement = null, level = 0) {
+            if (!parentElement) {
+                const parentCategoryDropdown = document.getElementById('parent-category');
+                parentCategoryDropdown.innerHTML = ''; // Clear existing options
+                const noneOption = document.createElement('option');
+                noneOption.value = 'None';
+                noneOption.text = '-- None --';
+                parentCategoryDropdown.appendChild(noneOption);
+            }
+
+            categories.forEach(category => {
+                const categoryElement = createCategoryElement(category, level);
+                parentElement.appendChild(categoryElement);
+
+                const option = document.createElement('option');
+                option.value = category.id;
+                option.text = category.name;
+                document.getElementById('parent-category').appendChild(option);
+
+                if (category.subCategories.length > 0) {
+                    const subCategoriesElement = document.createElement('div');
+                    categoryElement.appendChild(subCategoriesElement);
+                    displayCategories(category.subCategories, subCategoriesElement, level + 1);
+                }
+            });
+        }
+
+        function fetchCategories() {
+            $.ajax({
+                url: '/rr/categories/1',
+                type: 'GET',
+                success: function (response) {
+                    console.log(response);
+                    const categoriesElement = document.getElementById('categories');
+                    categoriesElement.innerHTML = ''; // Clear existing categories
+                    const parentCategoryDropdown = document.getElementById('parent-category');
+                    parentCategoryDropdown.innerHTML = ''; // Clear existing options
+
+                    // Create an option for the root category
+                    const rootOption = document.createElement('option');
+                    rootOption.value = response.id;
+                    rootOption.text = '-None-';
+                    parentCategoryDropdown.appendChild(rootOption);
+
+                    displayCategories(response.subCategories, categoriesElement);
+                }
+            });
+        }
+        $(document).ready(function () {
+            fetchCategories();
+        });
+
+        ///////////////////////新增///////////////////////////
+        function addCategory() {
+            const categoryName = document.getElementById('category-name').value;
+            const parentCategoryId = document.getElementById('parent-category').value;
+
+            // Your AJAX call to add the new category
+            $.ajax({
+                url: '/rr/categories',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    name: categoryName,
+                    parentid: parentCategoryId
+                }),
+                success: function () {
+                    showAlert('成功! 類別已成功添加！', true);
+                    fetchCategories();
+                    $('#modal-close').click();
+                },
+                error: function () {
+                    showAlert('失敗! 添加類別失敗。', false);
+                }
+            });
+        }
+
+        function showAlert(message, isSuccess) {
+            $("#dialog-message").text(message);
+            $("#dialog").dialog({
+                modal: true,
+                closeOnEscape: true, // Allow the dialog to be closed with the Escape key
+                showCloseButton: true, // Show the 'X' button in the title bar
+                position: { my: "right bottom", at: "right-20 bottom-20", of: window },
+                buttons: {
+                    Ok: function () {
+                        $(this).dialog("close");
+                    }
+                }
+            });
+
+            // Set dialog color based on success or failure
+            if (isSuccess) {
+                $(".ui-dialog-titlebar").css({ background: '#5cb85c', color: '#fff' }); // Green color for success
+            } else {
+                $(".ui-dialog-titlebar").css({ background: '#d9534f', color: '#fff' }); // Red color for error
+            }
+
+            setTimeout(function () {
+                $("#dialog").dialog("close");
+            }, 1500);
+        }
+
+
+
+
+
+        function deleteCategory(id) {
+            console.log(`Delete category: ${id}`);
+        }
+
+        function saveCategory(id) {
+            const categoryElement = document.getElementById(`category-${id}`);
+            const categoryNameElement = categoryElement.querySelector('.category-name');
+            const editButton = categoryElement.querySelector('.edit-button');
+            const parentCategoryIdElement = categoryElement.querySelector('.parent-category-id');
+            const parentCategoryIdSelect = document.getElementById(`select-parent-${id}`);
+
+            categoryNameElement.contentEditable = "false";
+
+            // Get the new category name and parent id
+            const newCategoryName = categoryNameElement.textContent;
+            const newParentId = parentCategoryIdSelect.value;
+
+            editButton.textContent = '編輯';
+            editButton.onclick = function () {
+                editCategory(id);
+            };
+
+            parentCategoryIdElement.textContent = newParentId;
+            parentCategoryIdElement.style.display = "none";
+
+            $.ajax({
+                url: '/rr/categories',
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    id: id,
+                    name: newCategoryName,
+                    parentid: newParentId
+                }),
+                success: function () {
+                    showAlert('成功! 類別已成功更新！', true);
+                    fetchCategories();
+                },
+                error: function () {
+                    showAlert('失敗! 更新類別失敗。', false);
+                }
+            });
+            console.log(`Save category: ${id}, New name: ${newCategoryName}, New parent id: ${newParentId}`);
+        }
+
+
+
+        function editCategory(id) {
+            const categoryElement = document.getElementById(`category-${id}`);
+            const categoryNameElement = categoryElement.querySelector('.category-name');
+            const editButton = categoryElement.querySelector('.edit-button');
+            const parentCategoryIdElement = categoryElement.querySelector('.parent-category-id');
+
+            // Enable editing for the category name
+            categoryNameElement.contentEditable = "true";
+            categoryNameElement.focus();
+
+            // Create a new select element for category options
+            let categorySelect = document.createElement('select');
+            categorySelect.id = `select-parent-${id}`;
+
+            // Get all categories and add them as options
+            $.ajax({
+                url: '/rr/categories/1',
+                type: 'GET',
+                success: function (response) {
+
+                    let noneOption = document.createElement('option');
+                    noneOption.value = '1';  // Assuming '1' represents 'None' or root category
+                    noneOption.text = 'None';
+                    categorySelect.appendChild(noneOption);
+
+                    ////620////////
+                    let allCategories = flattenCategories(response.subCategories, id);
+                    allCategories.forEach(function (category) {
+                        let optionElement = document.createElement('option');
+                        optionElement.value = category.id;
+                        optionElement.text = category.name;
+                        categorySelect.appendChild(optionElement);
+                    });
+
+                    // After all options are added, set the default value
+                    categorySelect.value = parentCategoryIdElement.textContent;
+
+                    // Replace the current parent id with the new select element
+                    parentCategoryIdElement.style.display = "block";
+                    parentCategoryIdElement.textContent = '';
+                    parentCategoryIdElement.appendChild(categorySelect);
+                }
+            });
+            // Change the text and the onclick event of the edit button to save the changes
+            editButton.textContent = '保存';
+            editButton.onclick = function () {
+                saveCategory(id);
+            };
+        }
+        ////////620///////////
+        function flattenCategories(categories, editingCategoryId = null) {
+            let flatCategories = [];
+
+            categories.forEach(function (category) {
+                if (category.id !== editingCategoryId) {
+                    flatCategories.push(category);
+                }
+                if (category.subCategories && category.subCategories.length > 0) {
+                    let subCategories = flattenCategories(category.subCategories, editingCategoryId);
+                    flatCategories = flatCategories.concat(subCategories);
+                }
+            });
+
+            return flatCategories;
+        }
+
+
+
+
+    </script>
+</body>
+
+</html>
