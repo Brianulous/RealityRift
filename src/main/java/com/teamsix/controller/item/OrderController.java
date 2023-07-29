@@ -25,8 +25,15 @@ import com.teamsix.service.OrderService;
 @RequestMapping("/api/orders")
 public class OrderController {
 
+	private final OrderService orderService;
+	
+	
+
 	@Autowired
-	private OrderService orderService;
+	public OrderController(OrderService orderService) {
+		super();
+		this.orderService = orderService;
+	}
 
 	@PostMapping
 	public ResponseEntity<String> createOrder(@RequestBody OrderRequest orderRequest) {
@@ -101,10 +108,9 @@ public class OrderController {
 	
 	@PostMapping("/linepay")
 	public ResponseEntity<String> createPaymentRequest(@RequestBody CheckoutRequest checkoutRequest) {
-	    ResponseEntity<String> responseEntity = orderService.makePayment(checkoutRequest.getOrderId());
-	    String responseBody = responseEntity.getBody();
-	    return ResponseEntity.ok(responseBody);
+	    return orderService.makePayment(checkoutRequest.getOrderId());
 	}
+
 
 }
 

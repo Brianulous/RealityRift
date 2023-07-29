@@ -12,14 +12,15 @@ import org.springframework.data.repository.query.Param;
 
 import com.teamsix.model.bean.item.Orders;
 
-public interface OrderRepository extends JpaRepository<Orders, Long>,JpaSpecificationExecutor<Orders> {
-	
-	 Page<Orders> findByMemberMemno(int memno, Pageable pageable);
-	 
-	 @Query(value = "SELECT YEAR(orderDate) as year, MONTH(orderDate) as month, SUM(totalAmount) as totalSales " +
-             "FROM Orders " +
-             "WHERE YEAR(orderDate) = :year " +
-             "GROUP BY YEAR(orderDate), MONTH(orderDate) " +
-             "ORDER BY month ASC", nativeQuery = true)
-List<Map<String, Object>> findSalesByYear(@Param("year") int year);
+public interface OrderRepository extends JpaRepository<Orders, Long>, JpaSpecificationExecutor<Orders> {
+
+	Page<Orders> findByMemberMemno(int memno, Pageable pageable);
+
+	// whether change nativeQuery into JPQL? think about it !
+	@Query("SELECT NEW map(YEAR(o.orderDate) as year, MONTH(o.orderDate) as month, SUM(o.totalAmount) as totalSales) "
+			+ "FROM Orders o " + "WHERE YEAR(o.orderDate) = :year " + "GROUP BY YEAR(o.orderDate), MONTH(o.orderDate) "
+			+ "ORDER BY month ASC")
+	List<Map<String, Object>> findSalesByYear(@Param("year") int year);
+	// UGLY UGLY UGLY UGLY!!!!
+
 }

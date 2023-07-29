@@ -21,18 +21,25 @@ import com.teamsix.service.OrderService;
 @RequestMapping("/chart")
 public class ChartController {
 
-	@Autowired
-	private ItemRepository itemRepository;
+	private final ItemRepository itemRepository;
+
+	private final OrderService orderService;
 
 	@Autowired
-	private OrderService orderService;
+	public ChartController(ItemRepository itemRepository, OrderService orderService) {
+		super();
+		this.itemRepository = itemRepository;
+		this.orderService = orderService;
+	}
 
 	@GetMapping("/itemSales")
 	public ResponseEntity<Map<String, Integer>> getSales() {
+		//正常商業邏輯下不抓全部商品可能會更好(例如:只抓銷量超過1000商品)，來增加效能
 		List<ItemDTO> items = itemRepository.findAll();
 		Map<String, Integer> salesData = new HashMap<>();
 
 		for (ItemDTO item : items) {
+			//商品:銷量
 			salesData.put(item.getItemname(), item.getSalescount());
 		}
 
@@ -44,6 +51,7 @@ public class ChartController {
 		List<ItemDTO> items = itemRepository.findAll();
 		Map<String, BigDecimal> salesData = new HashMap<>();
 		for (ItemDTO item : items) {
+			//商品:銷售額
 			BigDecimal salesAmount = BigDecimal.valueOf(item.getSalescount()).multiply(item.getPrice());
 			salesData.put(item.getItemname(), salesAmount);
 		}
