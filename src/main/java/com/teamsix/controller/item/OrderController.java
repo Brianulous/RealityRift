@@ -2,7 +2,6 @@ package com.teamsix.controller.item;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -44,7 +43,7 @@ public class OrderController {
 	        @RequestParam(defaultValue = "0") int page,
 	        @RequestParam(defaultValue = "10") int size) {
 
-	    Page<Orders> result = orderService.getOrders(Optional.ofNullable(memno), Optional.ofNullable(period), Optional.ofNullable(status), page, size);
+	    Page<Orders> result = orderService.getOrders(memno, period, status, page, size);
 
 	    return new ResponseEntity<>(result, HttpStatus.OK);
 	}
