@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,34 +21,39 @@ import com.teamsix.model.bean.item.Itemimg;
 import com.teamsix.model.bean.item.ItemimgDTO;
 import com.teamsix.service.ItemService;
 
-
 @Controller
 public class ImgController {
-	
+
+	private final ItemService iService;
+
+	@Value("${file.upload.path}")
+	private String fileUploadPath;
+
 	@Autowired
-	private ItemService iService;
-	
+	public ImgController(ItemService iService) {
+		super();
+		this.iService = iService;
+	}
+
 	@DeleteMapping("api/deleteImg")
 	@ResponseBody
-	public List<ItemimgDTO> deleteAction(@RequestParam("id")int imgid) {
+	public List<ItemimgDTO> deleteAction(@RequestParam("id") int imgid) {
 		List<Itemimg> newImages = iService.findAllImgsById(imgid);
 		iService.deleteImgById(imgid);
-		List<ItemimgDTO>dtos = new LinkedList<>();
-		for(Itemimg image:newImages) {
+		List<ItemimgDTO> dtos = new LinkedList<>();
+		for (Itemimg image : newImages) {
 			ItemimgDTO dto = new ItemimgDTO();
 			dto.setId(image.getId());
 			dto.setImagename(image.getImagename());
 			dtos.add(dto);
 		}
-		
-		return dtos;
-	}	
 
+		return dtos;
+	}
 
 	@PostMapping("/api/imgUpload")
 	@ResponseBody
-	public List<ItemimgDTO> uploadImgAction(
-			@RequestParam("images") List<MultipartFile> images,
+	public List<ItemimgDTO> uploadImgAction(@RequestParam("images") List<MultipartFile> images,
 			@RequestParam("itemid") int itemid) throws IOException {
 
 		ItemDTO newItem = iService.findItemById(itemid);
@@ -60,7 +66,7 @@ public class ImgController {
 				itemImage.setImagename(UUID.randomUUID().toString() + "_" + image.getOriginalFilename());
 				try {
 					byte[] imageData = image.getBytes();
-					File file = new File("C:\\ProjectImages\\itemimgs\\" + itemImage.getImagename());
+					File file = new File(fileUploadPath + itemImage.getImagename());
 					FileUtils.writeByteArrayToFile(file, imageData);
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -69,23 +75,21 @@ public class ImgController {
 				itemImage.setItem(item);
 //				itemImage.setItemid(itemid);
 				item.addImage(itemImage);
-			
-			
+
 				iService.saveItemImage(itemImage);
 			}
 		}
 		List<Itemimg> NewImages = item.getImages();
-		List<ItemimgDTO>dtos = new LinkedList<>();
-		for(Itemimg image:NewImages) {
+		List<ItemimgDTO> dtos = new LinkedList<>();
+		for (Itemimg image : NewImages) {
 			ItemimgDTO dto = new ItemimgDTO();
 			dto.setId(image.getId());
 			dto.setImagename(image.getImagename());
 			dtos.add(dto);
 		}
-		
+
 		return dtos;
-		
-		
+
 	}
 
 }

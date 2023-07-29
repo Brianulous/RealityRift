@@ -12,6 +12,7 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,17 +34,20 @@ import com.teamsix.service.NotificationService;
 @Controller
 public class ItemController {
 
-	@Autowired
-	private ItemService iService;
+	private final ItemService iService;
+
+	private final CategoryService categoryService;
+
+	private final NotificationService notify;
 
 	@Autowired
-	private CategoryService categoryService;
+	public ItemController(ItemService iService, CategoryService categoryService, NotificationService notify) {
+		super();
+		this.iService = iService;
+		this.categoryService = categoryService;
+		this.notify = notify;
+	}
 
-	
-	@Autowired
-	private NotificationService notify;
-	
-	
 	@GetMapping("/db/manager.showItemList.do")
 	public String getAllItems(Model model) {
 		List<ItemDTO> itemList = iService.listItem();
@@ -64,15 +68,10 @@ public class ItemController {
 
 	@ResponseBody
 	@PostMapping("/addItem.do")
-	public String addItem(
-			@RequestParam("itemname") String itemname, 
-			@RequestParam("price") BigDecimal price,
-			@RequestParam("salescount") int salescount, 
-			@RequestParam("stock") int stock,
-			@RequestParam("itemstatus") String itemstatus, 
-			@RequestParam("itemdetail") String itemdetail,
-			@RequestParam("categoryid") Integer categoryid,
-			@RequestParam(value = "added",required = false)Date added,
+	public  ResponseEntity<String> addItem(@RequestParam("itemname") String itemname, @RequestParam("price") BigDecimal price,
+			@RequestParam("salescount") int salescount, @RequestParam("stock") int stock,
+			@RequestParam("itemstatus") String itemstatus, @RequestParam("itemdetail") String itemdetail,
+			@RequestParam("categoryid") Integer categoryid, @RequestParam(value = "added", required = false) Date added,
 			@RequestParam(value = "images", required = false) List<MultipartFile> images) throws IOException {
 
 		ItemDTO item = new ItemDTO();
@@ -82,9 +81,9 @@ public class ItemController {
 		item.setStock(stock);
 		item.setItemstatus(itemstatus);
 		item.setItemdetail(itemdetail);
-		
-		if(added != null){
-		    item.setAdded(added);
+
+		if (added != null) {
+			item.setAdded(added);
 		}
 
 		Category category = categoryService.getCategoryById(categoryid);
@@ -108,19 +107,19 @@ public class ItemController {
 		}
 
 		iService.insertItem(item);
-		
+
 		Notification notification = new Notification();
 		notification.setTitle("新商品上架");
-		notification.setContent(item.getItemname()+"上架囉!");
+		notification.setContent(item.getItemname() + "上架囉!");
 		List<Itemimg> images1 = item.getImages();
 		if (images1 != null && !images1.isEmpty()) {
-		    notification.setImgSrc(images1.get(0).getImagename());
+			notification.setImgSrc(images1.get(0).getImagename());
 		} else {
-		    notification.setImgSrc("defaultPic.jpg");
+			notification.setImgSrc("defaultPic.jpg");
 		}
 		notify.sendNotification(notification);
 
-		return "新增成功";
+		return ResponseEntity.ok("新增成功");
 	}
 
 	@GetMapping("/covertToAddItem.do")
@@ -130,15 +129,10 @@ public class ItemController {
 
 	@PutMapping("/updateItemAjax.do")
 	@ResponseBody
-	public ItemDTO editItem(
-			@RequestParam("itemid") int itemId, 
-			@RequestParam("itemname") String itemName,
-			@RequestParam("stock") int stock, 
-			@RequestParam("salescount") int salesCount,
-			@RequestParam("itemstatus") String itemStatus, 
-			@RequestParam("itemdetail") String itemDetail,
-			@RequestParam("price") BigDecimal price, 
-			@RequestParam(value = "added",required = false)Date added,
+	public ItemDTO editItem(@RequestParam("itemid") int itemId, @RequestParam("itemname") String itemName,
+			@RequestParam("stock") int stock, @RequestParam("salescount") int salesCount,
+			@RequestParam("itemstatus") String itemStatus, @RequestParam("itemdetail") String itemDetail,
+			@RequestParam("price") BigDecimal price, @RequestParam(value = "added", required = false) Date added,
 			@RequestParam("categoryid") int categoryId) {
 
 		ItemDTO bean = iService.findItemById(itemId);
@@ -149,8 +143,8 @@ public class ItemController {
 		bean.setPrice(price);
 		bean.setSalescount(salesCount);
 		bean.setStock(stock);
-		
-		if(added!=null){
+
+		if (added != null) {
 			bean.setAdded(added);
 		}
 
@@ -213,7 +207,5 @@ public class ItemController {
 
 		return new PageImpl<>(content, itemPage.getPageable(), itemPage.getTotalElements());
 	}
-	
-	
 
 }
