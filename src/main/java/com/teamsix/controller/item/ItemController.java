@@ -68,10 +68,11 @@ public class ItemController {
 
 	@ResponseBody
 	@PostMapping("/addItem.do")
-	public  ResponseEntity<String> addItem(@RequestParam("itemname") String itemname, @RequestParam("price") BigDecimal price,
-			@RequestParam("salescount") int salescount, @RequestParam("stock") int stock,
-			@RequestParam("itemstatus") String itemstatus, @RequestParam("itemdetail") String itemdetail,
-			@RequestParam("categoryid") Integer categoryid, @RequestParam(value = "added", required = false) Date added,
+	public ResponseEntity<String> addItem(@RequestParam("itemname") String itemname,
+			@RequestParam("price") BigDecimal price, @RequestParam("salescount") int salescount,
+			@RequestParam("stock") int stock, @RequestParam("itemstatus") String itemstatus,
+			@RequestParam("itemdetail") String itemdetail, @RequestParam("categoryid") Integer categoryid,
+			@RequestParam(value = "added", required = false) Date added,
 			@RequestParam(value = "images", required = false) List<MultipartFile> images) throws IOException {
 
 		ItemDTO item = new ItemDTO();

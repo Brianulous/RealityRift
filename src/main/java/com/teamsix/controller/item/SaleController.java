@@ -30,20 +30,26 @@ import com.teamsix.service.SaleService;
 @RequestMapping("/api/sales")
 public class SaleController {
 
-	@Autowired
-	private SaleService saleService;
+	private final SaleService saleService;
+
+	private final ItemService itemService;
+
+	private final SaleItemRepository saleItemRepo;
+
+	private final SaleStatusUpdater saleStatusUpdater;
+
+	private final SimpMessagingTemplate simpMessagingTemplate;
 
 	@Autowired
-	private ItemService itemService;
-
-	@Autowired
-	private SaleItemRepository saleItemRepo;
-
-	@Autowired
-	private SaleStatusUpdater saleStatusUpdater;
-	
-	@Autowired
-	private SimpMessagingTemplate simpMessagingTemplate;
+	public SaleController(SaleService saleService, ItemService itemService, SaleItemRepository saleItemRepo,
+			SaleStatusUpdater saleStatusUpdater, SimpMessagingTemplate simpMessagingTemplate) {
+		super();
+		this.saleService = saleService;
+		this.itemService = itemService;
+		this.saleItemRepo = saleItemRepo;
+		this.saleStatusUpdater = saleStatusUpdater;
+		this.simpMessagingTemplate = simpMessagingTemplate;
+	}
 
 	@PostMapping
 	public ResponseEntity<SaleDTO> createSale(@RequestBody SaleDTO saleDTO) {
@@ -57,12 +63,12 @@ public class SaleController {
 		}
 
 		SaleDTO createdSale = saleService.createSale(saleDTO);
-		
+
 		Notification notification = new Notification();
 		notification.setTitle("限時特賣新增");
-		notification.setContent(saleDTO.getSaleName()+"開始囉");
+		notification.setContent(saleDTO.getSaleName() + "開始囉");
 		notification.setImgSrc("sale.jpg");
-		  simpMessagingTemplate.convertAndSend("/topic/notifications",notification );
+		simpMessagingTemplate.convertAndSend("/topic/notifications", notification);
 		return new ResponseEntity<>(createdSale, HttpStatus.CREATED);
 	}
 
